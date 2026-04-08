@@ -190,7 +190,7 @@
 
 						<!-- Contact Form
 						============================================= -->
-						<form class="nobottommargin" id="template-contactform" name="template-contactform" action="https://formsubmit.co/ajax/info@wildchildstudios.com" method="post">
+						<form class="nobottommargin" id="template-contactform" name="template-contactform" action="https://formsubmit.co/info@wildchildstudios.com" method="post">
 
 							<div class="col_full">
 								<label for="template-contactform-name">Name <small>*</small></label>
@@ -237,6 +237,7 @@
 							<input type="hidden" name="_subject" value="New Contact Request - WildChild Studios">
 							<input type="hidden" name="_captcha" value="false">
 							<input type="hidden" name="_template" value="table">
+							<input type="hidden" name="_next" value="https://www.wildchildstudios.com/contact.html?submitted=1">
 
 						</form>
 
@@ -514,51 +515,18 @@
 			function hideToast(delay) {
 				setTimeout(function () {
 					toast.classList.remove('show');
-				}, delay || 2200);
+				}, delay || 2600);
 			}
 
-			form.addEventListener('submit', function (e) {
-				e.preventDefault();
+			var params = new URLSearchParams(window.location.search);
+			if (params.get('submitted') === '1') {
+				showToast('Request submitted successfully.', 'success');
+				hideToast(2800);
+			}
 
+			form.addEventListener('submit', function () {
 				showToast('Submitting request...', 'loading');
 				submitBtn.disabled = true;
-
-				var formData = new FormData(form);
-
-				fetch(form.action, {
-					method: 'POST',
-					headers: {
-						'Accept': 'application/json'
-					},
-					body: formData
-				})
-				.then(function (response) {
-					if (!response.ok) {
-						throw new Error('Request failed with status ' + response.status);
-					}
-					return response.json();
-				})
-				.then(function (data) {
-					var isSuccess = data && (
-						data.alert === 'success' ||
-						data.success === true ||
-						data.success === 'true'
-					);
-
-					if (isSuccess) {
-						showToast('Request submitted successfully.', 'success');
-						form.reset();
-					} else {
-						showToast('Request failed. Please try again.', 'error');
-					}
-				})
-				.catch(function () {
-					showToast('Network error. Please try again.', 'error');
-				})
-				.finally(function () {
-					submitBtn.disabled = false;
-					hideToast(2500);
-				});
 			});
 		})();
 	</script>
