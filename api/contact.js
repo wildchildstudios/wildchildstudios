@@ -4,7 +4,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, email, phone, subject, message, honey } = req.body || {};
+    const body =
+      typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    const { name, email, phone, subject, message, honey } = body;
 
     // Honeypot: silently succeed for likely bots.
     if (honey) {
@@ -69,7 +71,11 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ success: true });
   } catch (error) {
-    return res.status(500).json({ success: false, error: "Server error" });
+    return res.status(500).json({
+      success: false,
+      error: "Server error",
+      details: error?.message || "Unknown error",
+    });
   }
 }
 

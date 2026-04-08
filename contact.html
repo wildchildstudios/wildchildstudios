@@ -533,10 +533,13 @@
 					body: JSON.stringify(payload)
 				})
 				.then(function (response) {
-					if (!response.ok) {
-						throw new Error('Failed with status ' + response.status);
-					}
-					return response.json();
+					return response.json().then(function (data) {
+						if (!response.ok) {
+							var serverMessage = (data && (data.error || data.details)) ? (data.error + (data.details ? ': ' + data.details : '')) : ('Failed with status ' + response.status);
+							throw new Error(serverMessage);
+						}
+						return data;
+					});
 				})
 				.then(function (data) {
 					if (data && data.success) {
@@ -546,8 +549,8 @@
 						showToast('Request failed. Please try again.', 'error');
 					}
 				})
-				.catch(function () {
-					showToast('Request failed. Please try again.', 'error');
+				.catch(function (error) {
+					showToast(error && error.message ? error.message : 'Request failed. Please try again.', 'error');
 				})
 				.finally(function () {
 					submitBtn.disabled = false;
