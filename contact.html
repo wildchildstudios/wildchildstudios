@@ -196,7 +196,9 @@
 
 			<!-- Google Map
 			============================================= -->
-			<section id="google-map" class="gmap"><div id="map"></div></section>
+			<section id="google-map" class="gmap">
+				<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3670.67895341451!2d72.51267857564099!3d23.072228879138947!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e84892b5ae783%3A0x84cd0b6497653de5!2sWildChild%20Studios!5e0!3m2!1sen!2sin!4v1775637216968!5m2!1sen!2sin" width="600" height="450" style="border:0; width: 100%;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+			</section>
 
 		</section><!-- Contact Form & Map Overlay Section End -->
 
@@ -440,21 +442,7 @@
 	<!-- Footer Scripts
 	============================================= -->
 	<script src="js/functions.js"></script>
-	<script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5OJjQyiUqkeq56PuhCYvg10_UMYrYZcU&callback=initMap">
-    </script>
-
-	<script>
-function initMap() {
-  // The location of Uluru
-  var uluru = {lat: 22.999916, lng: 72.499427};
-  // The map, centered at Uluru
-  var map = new google.maps.Map(
-      document.getElementById('map'), {zoom: 17, center: uluru});
-  // The marker, positioned at Uluru
-  var marker = new google.maps.Marker({position: uluru, map: map, title: 'WildChild Studios'});
-}
-	</script>
+	
 	
 	
 	
