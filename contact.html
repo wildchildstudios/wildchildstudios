@@ -190,7 +190,7 @@
 
 						<!-- Contact Form
 						============================================= -->
-						<form class="nobottommargin" id="template-contactform" name="template-contactform" action="https://formsubmit.co/info@wildchildstudios.com" method="post">
+						<form class="nobottommargin" id="template-contactform" name="template-contactform" action="/api/contact" method="post">
 
 							<div class="col_full">
 								<label for="template-contactform-name">Name <small>*</small></label>
@@ -228,11 +228,6 @@
 							<div class="col_full">
 								<button class="button button-3d nomargin" type="submit" id="template-contactform-submit">Send Message</button>
 							</div>
-
-							<input type="hidden" name="_subject" value="Inquiry from Website Wildchildstudios">
-							<input type="hidden" name="_captcha" value="false">
-							<input type="hidden" name="_template" value="table">
-							<input type="hidden" name="_next" value="https://www.wildchildstudios.com/contact.html?submitted=1">
 
 						</form>
 
@@ -513,15 +508,51 @@
 				}, delay || 2600);
 			}
 
-			var params = new URLSearchParams(window.location.search);
-			if (params.get('submitted') === '1') {
-				showToast('Request submitted successfully.', 'success');
-				hideToast(2800);
-			}
+			form.addEventListener('submit', function (e) {
+				e.preventDefault();
 
-			form.addEventListener('submit', function () {
 				showToast('Submitting request...', 'loading');
 				submitBtn.disabled = true;
+
+				var formData = new FormData(form);
+				var payload = {
+					name: formData.get('Name') || '',
+					email: formData.get('Email') || '',
+					phone: formData.get('Phone') || '',
+					subject: formData.get('Subject') || '',
+					message: formData.get('Message') || '',
+					honey: formData.get('_honey') || ''
+				};
+
+				fetch(form.action, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': 'application/json'
+					},
+					body: JSON.stringify(payload)
+				})
+				.then(function (response) {
+					if (!response.ok) {
+						throw new Error('Failed with status ' + response.status);
+					}
+					return response.json();
+				})
+				.then(function (data) {
+					if (data && data.success) {
+						showToast('Request submitted successfully.', 'success');
+						form.reset();
+					} else {
+						showToast('Request failed. Please try again.', 'error');
+					}
+				})
+				.catch(function () {
+					showToast('Request failed. Please try again.', 'error');
+				})
+				.finally(function () {
+					submitBtn.disabled = false;
+					hideToast(2800);
+				});
 			});
 		})();
 	</script>
