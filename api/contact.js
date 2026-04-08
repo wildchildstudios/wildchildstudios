@@ -47,20 +47,41 @@ export default async function handler(req, res) {
       <p><strong>Message:</strong><br>${safe(message).replace(/\n/g, "<br>")}</p>
     `;
 
-    const resendResp = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: [toEmail],
-        reply_to: email,
-        subject: emailSubject,
-        html,
-      }),
-    });
+    const sendEmail = async (fromValue) =>
+      fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: fromValue,
+          to: [toEmail],
+          reply_to: email,
+          subject: emailSubject,
+          html,
+        }),
+      });
+
+    let resendResp = await sendEmail(fromEmail);
+
+    // If custom domain is not verified yet, fall back to Resend's onboarding sender.
+    if (!resendResp.ok) {
+      const firstErrorText = await resendResp.text();
+      if (
+        resendResp.status === 403 &&
+        firstErrorText.toLowerCase().includes("domain is not verified") &&
+        !String(fromEmail).includes("onboarding@resend.dev")
+      ) {
+        resendResp = await sendEmail("WildChild Studios <onboarding@resend.dev>");
+      } else {
+        return res.status(502).json({
+          success: false,
+          error: "Mail provider error",
+          details: firstErrorText,
+        });
+      }
+    }
 
     if (!resendResp.ok) {
       const errText = await resendResp.text();
