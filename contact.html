@@ -190,7 +190,7 @@
 
 						<!-- Contact Form
 						============================================= -->
-						<form class="nobottommargin" id="template-contactform" name="template-contactform" action="contact-mail.php" method="post">
+						<form class="nobottommargin" id="template-contactform" name="template-contactform" action="https://formsubmit.co/ajax/info@wildchildstudios.com" method="post">
 
 							<div class="col_full">
 								<label for="template-contactform-name">Name <small>*</small></label>
@@ -234,6 +234,9 @@
 							<input type="hidden" name="prefix" value="template-contactform-">
 							<input type="hidden" name="replyto" value="template-contactform-email,template-contactform-name">
 							<input type="hidden" name="html_title" value="WildChild Studios Contact Request">
+							<input type="hidden" name="_subject" value="New Contact Request - WildChild Studios">
+							<input type="hidden" name="_captcha" value="false">
+							<input type="hidden" name="_template" value="table">
 
 						</form>
 
@@ -524,6 +527,9 @@
 
 				fetch(form.action, {
 					method: 'POST',
+					headers: {
+						'Accept': 'application/json'
+					},
 					body: formData
 				})
 				.then(function (response) {
