@@ -19,12 +19,60 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	
 	<style>
-      /* Set the size of the div element that contains the map */
-      #map {
-        height: 100%;  /* The height is 400 pixels */
-        width: 100%;  /* The width is the width of the web page */
-       }
-    </style>
+		#google-map {
+			width: 100%;
+			min-height: 650px;
+		}
+
+		#google-map iframe {
+			display: block;
+			width: 100%;
+			height: 650px;
+			border: 0;
+		}
+
+		#form-toast {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			z-index: 99999;
+			padding: 12px 16px;
+			border-radius: 6px;
+			color: #fff;
+			background: #333;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+			font-size: 14px;
+			opacity: 0;
+			transform: translateY(-10px);
+			pointer-events: none;
+			transition: all 0.25s ease;
+		}
+
+		#form-toast.show {
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		#form-toast.loading {
+			background: #2d7ef7;
+		}
+
+		#form-toast.success {
+			background: #28a745;
+		}
+
+		#form-toast.error {
+			background: #dc3545;
+		}
+
+		@media (max-width: 767px) {
+			#google-map,
+			#google-map iframe {
+				min-height: 420px;
+				height: 420px;
+			}
+		}
+	</style>
 
 	<!-- Document Title
 	============================================= -->
@@ -184,6 +232,8 @@
 							</div>
 
 							<input type="hidden" name="prefix" value="template-contactform-">
+							<input type="hidden" name="replyto" value="template-contactform-email,template-contactform-name">
+							<input type="hidden" name="html_title" value="WildChild Studios Contact Request">
 
 						</form>
 
@@ -197,7 +247,7 @@
 			<!-- Google Map
 			============================================= -->
 			<section id="google-map" class="gmap">
-				<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3670.67895341451!2d72.51267857564099!3d23.072228879138947!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e84892b5ae783%3A0x84cd0b6497653de5!2sWildChild%20Studios!5e0!3m2!1sen!2sin!4v1775637216968!5m2!1sen!2sin" width="600" height="450" style="border:0; width: 100%;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+				<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3670.67895341451!2d72.51267857564099!3d23.072228879138947!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e84892b5ae783%3A0x84cd0b6497653de5!2sWildChild%20Studios!5e0!3m2!1sen!2sin!4v1775637216968!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
 			</section>
 
 		</section><!-- Contact Form & Map Overlay Section End -->
@@ -442,10 +492,62 @@
 	<!-- Footer Scripts
 	============================================= -->
 	<script src="js/functions.js"></script>
-	
-	
-	
-	
+
+	<div id="form-toast"></div>
+	<script>
+		(function () {
+			var form = document.getElementById('template-contactform');
+			var toast = document.getElementById('form-toast');
+			var submitBtn = document.getElementById('template-contactform-submit');
+
+			if (!form || !toast || !submitBtn) return;
+
+			function showToast(text, type) {
+				toast.className = '';
+				toast.textContent = text;
+				toast.classList.add(type, 'show');
+			}
+
+			function hideToast(delay) {
+				setTimeout(function () {
+					toast.classList.remove('show');
+				}, delay || 2200);
+			}
+
+			form.addEventListener('submit', function (e) {
+				e.preventDefault();
+
+				showToast('Submitting request...', 'loading');
+				submitBtn.disabled = true;
+
+				var formData = new FormData(form);
+
+				fetch(form.action, {
+					method: 'POST',
+					body: formData
+				})
+				.then(function (response) {
+					return response.json();
+				})
+				.then(function (data) {
+					if (data && data.alert === 'success') {
+						showToast('Request submitted successfully.', 'success');
+						form.reset();
+					} else {
+						showToast('Request failed. Please try again.', 'error');
+					}
+				})
+				.catch(function () {
+					showToast('Network error. Please try again.', 'error');
+				})
+				.finally(function () {
+					submitBtn.disabled = false;
+					hideToast(2500);
+				});
+			});
+		})();
+	</script>
+
 
 </body>
 </html>
